@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ContentType, OptimizationResult } from "@/types";
+import { OptimizationResult } from "@/types";
 import { Copy, Check, RotateCcw, Sparkles, AlertCircle, FileCheck } from "lucide-react";
 import { Button } from "../ui/button";
 
@@ -231,7 +231,7 @@ export const OptimizedContentPanel: React.FC<OptimizedContentPanelProps> = ({ re
           <div>
             <h4 className="font-semibold text-slate-900 text-sm">Structured FAQ Pairs Breakdown</h4>
             <p className="text-xs text-slate-500">
-              Each FAQ is formulated under Fiverr's 300-character ceiling to reduce buyer friction.
+              Each FAQ is formulated under Fiverr&apos;s 300-character ceiling to reduce buyer friction.
             </p>
           </div>
 

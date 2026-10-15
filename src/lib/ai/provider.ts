@@ -185,6 +185,7 @@ function generateResearchBackedFallback(
   optionalContext?: string
 ) {
   const service = classification.coreService || classification.niche;
+  const contextNotes = optionalContext ? ` based on ${optionalContext.trim().slice(0, 40)}` : "";
   const tools = sellerOffer.statedToolsOrTech.length > 0 ? sellerOffer.statedToolsOrTech.join(" & ") : "";
 
   if (contentType === "title") {
@@ -311,7 +312,7 @@ Please contact me before ordering so we can verify technical compatibility and e
         },
       ],
       whyStronger:
-        "Restructures the draft into scannable sections (Deliverables, Process, Call-to-Action) while eliminating generic filler phrases and respecting the 1,200 character ceiling.",
+        `Restructures the draft${contextNotes} into scannable sections (Deliverables, Process, Call-to-Action) while eliminating generic filler phrases and respecting the 1,200 character ceiling.`,
       changes: [
         {
           section: "Introduction Hook",

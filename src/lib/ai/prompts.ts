@@ -2,6 +2,7 @@ import { ContentType, ExtractedSellerOffer, ServiceClassification, SourceRecord 
 
 export function buildSystemPrompt(contentType: ContentType): string {
   return `You are GigScope AI, an expert Fiverr marketplace content intelligence and pre-publication optimization engine.
+TARGET CONTENT TYPE FOR THIS RUN: ${contentType.toUpperCase()}.
 
 Your role is to analyze a seller's draft, integrate real market research evidence, and produce a polished, authentic, high-converting optimized draft.
 

@@ -1,7 +1,6 @@
 import {
   AnalyzeRequestPayload,
   OptimizationResult,
-  SourceRecord,
 } from "@/types";
 import { validateInputPayload } from "../security/input-limits";
 import { ValidationError } from "../utils/errors";

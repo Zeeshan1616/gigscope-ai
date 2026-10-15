@@ -12,7 +12,7 @@ export interface ResearchPlan {
 export function buildResearchPlan(
   classification: ServiceClassification,
   contentType: ContentType,
-  draftSnippet: string
+  draftSnippet?: string
 ): ResearchPlan {
   const service = classification.coreService || classification.niche || "freelance service";
   const subNiche = classification.subNiche || classification.niche;
@@ -37,6 +37,14 @@ export function buildResearchPlan(
   // Query 4: Niche-specific search
   if (subNiche && subNiche !== service) {
     queries.push(`"${subNiche}" service description deliverables`);
+  }
+
+  // Target specific technology or keyword from draft snippet if detected
+  if (draftSnippet && draftSnippet.trim().length > 0) {
+    const candidateWords = draftSnippet.split(/\s+/).filter((w) => w.length > 5);
+    if (candidateWords.length > 0 && !queries.some((q) => q.toLowerCase().includes(candidateWords[0].toLowerCase()))) {
+      queries.push(`"${service}" "${candidateWords[0]}" freelance`);
+    }
   }
 
   return {
