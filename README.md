@@ -2,6 +2,10 @@
 > **Research smarter. Write better. Launch with confidence.**  
 > *Turn your Fiverr Gig drafts into researched, buyer-focused content with competitor insights, keyword evidence, and practical optimization recommendations.*
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-emerald?style=for-the-badge&logo=github)](https://zeeshan1616.github.io/gigscope-ai/)
+
+**Live URL**: [https://zeeshan1616.github.io/gigscope-ai/](https://zeeshan1616.github.io/gigscope-ai/)
+
 ---
 
 ## 1. Product Overview

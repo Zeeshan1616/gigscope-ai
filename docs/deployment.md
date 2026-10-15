@@ -6,9 +6,16 @@
 - Optional: OpenRouter / NVIDIA NIM / OpenAI API Key
 - Optional: Tavily API Key
 
+## 2. Deploying to GitHub Pages (Automated CI/CD)
+
+GigScope AI is configured for automated static deployment via GitHub Actions:
+- **Live URL**: `https://zeeshan1616.github.io/gigscope-ai/`
+- **Workflow**: `.github/workflows/deploy.yml` builds with `output: 'export'` and deploys to the `github-pages` environment automatically on every push to `master`.
+- **Client-Side Optimization Engine**: Provides 100% interactive functionality directly inside the browser on GitHub Pages without requiring a server!
+
 ---
 
-## 2. Deploying to Vercel
+## 3. Deploying to Vercel
 
 GigScope AI is built with the Next.js App Router and deploys directly to Vercel without custom server configuration.
 

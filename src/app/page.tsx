@@ -10,6 +10,8 @@ import { AnalysisProgress } from "@/components/optimizer/analysis-progress";
 import { ResultsLayout } from "@/components/results/results-layout";
 import { AlertCircle, Sparkles, ShieldCheck } from "lucide-react";
 
+import { optimizeGigDraftClient } from "@/lib/client-optimize";
+
 export default function Home() {
   const [contentType, setContentType] = useState<ContentType>("title");
   const [draft, setDraft] = useState("");
@@ -35,25 +37,37 @@ export default function Home() {
     setError(null);
 
     try {
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      let data: OptimizationResult | null = null;
+
+      try {
+        const response = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contentType,
+            draft: draft.trim(),
+            optionalContext: optionalContext.trim() || undefined,
+          }),
+        });
+
+        if (response.ok) {
+          data = await response.json();
+        }
+      } catch {
+        // Seamless fallback on static hosting environments like GitHub Pages
+      }
+
+      if (!data) {
+        data = await optimizeGigDraftClient({
           contentType,
           draft: draft.trim(),
           optionalContext: optionalContext.trim() || undefined,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "An error occurred during market research analysis.");
+        });
       }
 
-      setResult(data as OptimizationResult);
+      setResult(data);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to connect to optimization server.";
+      const message = err instanceof Error ? err.message : "Failed to run optimization.";
       setError(message);
     } finally {
       setIsLoading(false);

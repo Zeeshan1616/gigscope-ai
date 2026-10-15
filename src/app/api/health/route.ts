@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-static";
+
 export async function GET() {
   const aiProvider = process.env.AI_PROVIDER || "openrouter";
   const aiModel = process.env.AI_MODEL || "nvidia/nemotron-3.5-lightning";
