@@ -91,6 +91,46 @@ export function validatePlatformRules(contentType: ContentType, text: string): V
         : `Description length is ${charLen} characters, exceeding Fiverr's strict 1,200 character cap.`,
       details: "Fiverr will reject Gig descriptions exceeding 1,200 characters.",
     });
+  } else if (contentType === "faqs") {
+    // Parse Q: and A: blocks if present in formatted FAQ text
+    const answers = [...text.matchAll(/(?:A:|Answer:)\s*([^\n]+(?:\n(?!(?:Q:|Question:))[^\n]+)*)/gi)].map(
+      (m) => m[1].trim()
+    );
+
+    let maxAnswerLen = 0;
+    let overLimitCount = 0;
+    for (const ans of answers) {
+      if (ans.length > maxAnswerLen) maxAnswerLen = ans.length;
+      if (ans.length > 300) overLimitCount++;
+    }
+
+    const answersCompliant = overLimitCount === 0;
+    checks.push({
+      id: "check-faq-answer-len",
+      category: "platform_compliance",
+      ruleName: "300-Character FAQ Answer Ceiling",
+      passed: answersCompliant,
+      severity: answersCompliant ? "passed" : "critical",
+      message: answersCompliant
+        ? `All FAQ answers respect Fiverr's 300-character ceiling (longest answer: ${maxAnswerLen}/300 chars).`
+        : `${overLimitCount} FAQ answer(s) exceed Fiverr's strict 300-character ceiling (longest: ${maxAnswerLen} chars).`,
+      details: "Fiverr enforces a hard platform limit of 300 characters per FAQ answer.",
+    });
+
+    const questionCount = (text.match(/(?:Q:|Question:)/gi) || []).length;
+    const countCompliant = questionCount > 0 && questionCount <= 10;
+    checks.push({
+      id: "check-faq-count",
+      category: "platform_compliance",
+      ruleName: "Fiverr FAQ Quantity Limit",
+      passed: countCompliant,
+      severity: countCompliant ? "passed" : "warning",
+      message: countCompliant
+        ? `${questionCount} FAQ pairs created (Fiverr allows up to 10 FAQs per gig).`
+        : questionCount === 0
+        ? "No FAQ questions detected."
+        : `${questionCount} FAQs created; Fiverr allows a maximum of 10 FAQs per gig.`,
+    });
   }
 
   return checks;

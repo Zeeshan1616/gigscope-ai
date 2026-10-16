@@ -3,6 +3,19 @@ import { checkRateLimit } from "@/lib/security/rate-limit";
 import { optimizeGigDraft } from "@/lib/ai/optimize";
 import { AppError } from "@/lib/utils/errors";
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: CORS_HEADERS,
+  });
+}
+
 export async function POST(req: NextRequest) {
   // 1. Determine client IP for rate limiting
   const forwardedFor = req.headers.get("x-forwarded-for");
@@ -19,6 +32,7 @@ export async function POST(req: NextRequest) {
       {
         status: 429,
         headers: {
+          ...CORS_HEADERS,
           "Retry-After": String(rateLimitStatus.resetSeconds),
           "X-RateLimit-Limit": String(rateLimitStatus.limit),
           "X-RateLimit-Remaining": String(rateLimitStatus.remaining),
@@ -37,7 +51,7 @@ export async function POST(req: NextRequest) {
         error: "Malformed JSON request body.",
         code: "INVALID_JSON",
       },
-      { status: 400 }
+      { status: 400, headers: CORS_HEADERS }
     );
   }
 
@@ -48,6 +62,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result, {
       status: 200,
       headers: {
+        ...CORS_HEADERS,
         "X-RateLimit-Limit": String(rateLimitStatus.limit),
         "X-RateLimit-Remaining": String(rateLimitStatus.remaining),
       },
@@ -60,7 +75,7 @@ export async function POST(req: NextRequest) {
           code: err.code,
           details: err.details,
         },
-        { status: err.statusCode }
+        { status: err.statusCode, headers: CORS_HEADERS }
       );
     }
 
@@ -70,7 +85,8 @@ export async function POST(req: NextRequest) {
         error: message,
         code: "INTERNAL_ERROR",
       },
-      { status: 500 }
+      { status: 500, headers: CORS_HEADERS }
     );
   }
 }
+

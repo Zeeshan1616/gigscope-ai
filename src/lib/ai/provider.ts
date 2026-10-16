@@ -115,6 +115,15 @@ async function callOpenAICompatibleEndpoint(
   const parsed = JSON.parse(cleaned);
 
   if (contentType === "title") {
+    if (typeof parsed.recommendedTitle === "string" && parsed.recommendedTitle.length > 80) {
+      parsed.recommendedTitle = parsed.recommendedTitle.slice(0, 80).trim();
+    }
+    if (Array.isArray(parsed.alternatives)) {
+      parsed.alternatives = parsed.alternatives.map((alt: { title?: string; [k: string]: unknown }) => ({
+        ...alt,
+        title: typeof alt.title === "string" && alt.title.length > 80 ? alt.title.slice(0, 80).trim() : alt.title,
+      }));
+    }
     const validated = TitleOptimizationSchema.parse(parsed);
     return {
       recommendedContent: validated.recommendedTitle,
@@ -127,6 +136,15 @@ async function callOpenAICompatibleEndpoint(
       itemsRequiringConfirmation: validated.itemsRequiringConfirmation,
     };
   } else if (contentType === "description") {
+    if (typeof parsed.recommendedContent === "string" && parsed.recommendedContent.length > 1200) {
+      parsed.recommendedContent = parsed.recommendedContent.slice(0, 1200).trim();
+    }
+    if (typeof parsed.conciseAlternative === "string" && parsed.conciseAlternative.length > 1200) {
+      parsed.conciseAlternative = parsed.conciseAlternative.slice(0, 1200).trim();
+    }
+    if (typeof parsed.detailedAlternative === "string" && parsed.detailedAlternative.length > 1200) {
+      parsed.detailedAlternative = parsed.detailedAlternative.slice(0, 1200).trim();
+    }
     const validated = DescriptionOptimizationSchema.parse(parsed);
     return {
       recommendedContent: validated.recommendedContent,
@@ -151,6 +169,13 @@ async function callOpenAICompatibleEndpoint(
       itemsRequiringConfirmation: validated.itemsRequiringConfirmation,
     };
   } else {
+    if (Array.isArray(parsed.faqItems)) {
+      parsed.faqItems = parsed.faqItems.map((item: { question?: string; answer?: string; [k: string]: unknown }) => ({
+        ...item,
+        question: typeof item.question === "string" && item.question.length > 100 ? item.question.slice(0, 100).trim() : item.question,
+        answer: typeof item.answer === "string" && item.answer.length > 300 ? item.answer.slice(0, 300).trim() : item.answer,
+      }));
+    }
     const validated = FAQOptimizationSchema.parse(parsed);
     return {
       recommendedContent: validated.faqItems.map((f) => `Q: ${f.question}\nA: ${f.answer}`).join("\n\n"),

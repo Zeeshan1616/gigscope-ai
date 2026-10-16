@@ -40,7 +40,14 @@ export default function Home() {
       let data: OptimizationResult | null = null;
 
       try {
-        const response = await fetch("/api/analyze", {
+        const apiBase =
+          process.env.NEXT_PUBLIC_API_URL ||
+          (typeof window !== "undefined" && window.location.pathname.startsWith("/gigscope-ai")
+            ? "/gigscope-ai"
+            : "");
+        const apiUrl = `${apiBase}/api/analyze`;
+
+        const response = await fetch(apiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -52,9 +59,27 @@ export default function Home() {
 
         if (response.ok) {
           data = await response.json();
+        } else if (response.status === 429) {
+          const errData = await response.json().catch(() => null);
+          throw new Error(
+            errData?.error || "Rate limit exceeded. Please wait a moment before submitting another optimization request."
+          );
+        } else if (response.status === 400) {
+          const errData = await response.json().catch(() => null);
+          throw new Error(errData?.error || "Validation error: Please verify your input draft.");
+        } else if (response.status === 404 || response.status === 405) {
+          // Static host (e.g. GitHub Pages) where Node.js POST API route is unavailable
+          data = null;
+        } else {
+          // Other status, fall back to client engine
+          data = null;
         }
-      } catch {
-        // Seamless fallback on static hosting environments like GitHub Pages
+      } catch (fetchErr: unknown) {
+        // If it's an explicit validation or rate-limit error, rethrow it
+        if (fetchErr instanceof Error && (fetchErr.message.includes("Rate limit") || fetchErr.message.includes("Validation error"))) {
+          throw fetchErr;
+        }
+        // Otherwise network/CORS error on static host, proceed to client fallback
       }
 
       if (!data) {

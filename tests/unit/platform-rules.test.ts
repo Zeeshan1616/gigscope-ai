@@ -37,4 +37,25 @@ describe("Fiverr Platform Rules Compliance", () => {
     expect(lenCheck?.passed).toBe(false);
     expect(lenCheck?.severity).toBe("critical");
   });
+
+  it("should enforce the 300-character FAQ answer ceiling", () => {
+    const validFaq = "Q: What is included?\nA: Complete responsive source files and assets.";
+    const validChecks = validatePlatformRules("faqs", validFaq);
+    expect(validChecks.find((c) => c.id === "check-faq-answer-len")?.passed).toBe(true);
+
+    const longFaq = `Q: What is included?\nA: ${"x".repeat(320)}`;
+    const longChecks = validatePlatformRules("faqs", longFaq);
+    const answerCheck = longChecks.find((c) => c.id === "check-faq-answer-len");
+    expect(answerCheck?.passed).toBe(false);
+    expect(answerCheck?.severity).toBe("critical");
+  });
+
+  it("should enforce the 10 FAQ quantity limit", () => {
+    const elevenFaqs = Array.from({ length: 11 }, (_, i) => `Q: Question ${i + 1}?\nA: Answer ${i + 1}`).join("\n\n");
+    const checks = validatePlatformRules("faqs", elevenFaqs);
+    const countCheck = checks.find((c) => c.id === "check-faq-count");
+    expect(countCheck?.passed).toBe(false);
+    expect(countCheck?.severity).toBe("warning");
+  });
 });
+
